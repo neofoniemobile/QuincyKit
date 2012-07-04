@@ -282,6 +282,17 @@
   if (Gestalt(gestaltSystemVersionMinor, &versionMinor) != noErr)  versionMinor= 0;
   if (Gestalt(gestaltSystemVersionBugFix, &versionBugFix) != noErr) versionBugFix = 0;
   
+  if (!self.autoSubmitCrashReport) {
+	if (_delegate && [_delegate respondsToSelector:@selector(crashReportDescription)]) {
+		NSString *description = [_delegate crashReportDescription];
+		if (notes) {
+			notes = [notes stringByAppendingFormat:@"\n\n%@", description];
+		} else {
+			notes = description;
+		}
+	}
+  }	
+	
   NSString* xml = [NSString stringWithFormat:@"<crash><applicationname>%s</applicationname><bundleidentifier>%s</bundleidentifier><systemversion>%@</systemversion><senderversion>%@</senderversion><version>%@</version><platform>%@</platform><userid>%@</userid><contact>%@</contact><description><![CDATA[%@]]></description><log><![CDATA[%@]]></log></crash>",
                    [[self applicationName] UTF8String],
                    [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"] UTF8String],
